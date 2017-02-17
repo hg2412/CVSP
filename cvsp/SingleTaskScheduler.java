@@ -6,7 +6,7 @@ import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.Date;
 
-public class Scheduler {
+public class SingleTaskScheduler {
 	public int numInstances; // number of instances, M in the paper
 	private Queue<Job> waitingJobs; // a queue of jobs
 	private PriorityQueue<Job> runningJobs; // an array of lists
@@ -17,7 +17,7 @@ public class Scheduler {
 	}
 
 	public static void setCurrentTime(Date currentTime) {
-		Scheduler.currentTime = currentTime;
+		SingleTaskScheduler.currentTime = currentTime;
 	}
 
 	public class JobComparator implements Comparator<Job> {
@@ -31,10 +31,9 @@ public class Scheduler {
 	public int totalIdleTime;
 
 	/**
-	 * given number of instances, initialize running jobs and waiting jobs of
-	 * CVSP
+	 * given number of instances, initialize running jobs and waiting jobs of CVSP
 	 */
-	public Scheduler(int numInstances) {
+	public SingleTaskScheduler(int numInstances) {
 		this.numInstances = numInstances;
 		this.runningJobs = new PriorityQueue<Job>(numInstances, new JobComparator());
 		this.waitingJobs = new LinkedList<Job>();
@@ -51,7 +50,7 @@ public class Scheduler {
 			Job job = waitingJobs.poll();
 			job.waitTime = (int) ((long) currentTime.getTime() - (long) job.start.getTime()) / 1000;
 			job.end = new Date();
-			job.end.setTime(currentTime.getTime() + (long) job.runtime * 1000);
+			job.end.setTime(currentTime.getTime() + (long) job.runTime * 1000);
 			runningJobs.add(job);
 		}
 		return true;
@@ -70,9 +69,9 @@ public class Scheduler {
 			System.out.println("Job completed!");
 			Job removedJob = runningJobs.poll();
 			// update current time
-			Scheduler.currentTime.setTime(removedJob.end.getTime());
+			SingleTaskScheduler.currentTime.setTime(removedJob.end.getTime());
 			removedJobs.add(removedJob);
-			assignJob();
+			this.assignJob();
 		}
 		return removedJobs;
 	}
@@ -92,7 +91,7 @@ public class Scheduler {
 			System.out.println("Job completed!");
 			Job removedJob = runningJobs.poll();
 			// update current time
-			Scheduler.currentTime.setTime(removedJob.end.getTime());
+			SingleTaskScheduler.currentTime.setTime(removedJob.end.getTime());
 			removedJobs.add(removedJob);
 			assignJob();
 		}
@@ -147,6 +146,5 @@ public class Scheduler {
 			System.out.println("job x is waiting");
 		for (Job j : runningJobs)
 			System.out.println("job x is running");
-
 	}
 }

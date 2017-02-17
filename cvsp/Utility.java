@@ -6,7 +6,10 @@ package cvsp;
  *
  */
 public class Utility {
-	
+
+	private static final double hourToMillisecond = 60 * 60 * 1000;
+	private static final double hourToSeconds = 60 * 60 ;
+
 	/**
 	 * TODO
 	 * calculate individual user utility

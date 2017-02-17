@@ -33,7 +33,7 @@ public class PoissonArrival {
 	
 	/**
 	 * TODO
-	 * @param empirical data of job arrivals
+	 * @param data : empirical data of job arrivals
 	 * @return calibrated arrival rate
 	 */
 	public double calibrate(double[] data){

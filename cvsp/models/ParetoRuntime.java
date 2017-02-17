@@ -1,13 +1,13 @@
 package cvsp.models;
 
 public class ParetoRuntime {
-	public double alpha;
-	public double tau_min;
+	private double alpha;
+	private double tau_min;
 
 	/**
 	 * set parameter of the model
-	 * @param alpha
-	 * @param tau_min
+	 * @param alpha - parameter of the model
+	 * @param tau_min - minimum runtime (in hours)
 	 */
 	public ParetoRuntime(double alpha, double tau_min) {
 		this.alpha = alpha;
@@ -27,7 +27,7 @@ public class ParetoRuntime {
 
 	/**
 	 * TODO
-	 * @param empirical data of job runtime
+	 * @param data - empirical data of job runtime
 	 * @return fit runtime
 	 */
 	public double fit(double[] data) {
