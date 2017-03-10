@@ -11,25 +11,22 @@ public class Utility {
 	private static final double hourToSeconds = 60 * 60 ;
 
 	/**
-	 * TODO
 	 * calculate individual user utility
 	 */
-	public static double userUtility(){
-		return 0;
+	public static double userUtility(double gamma, double lambda, double runtime, double waittime, double price, int numTasks){
+
+		return gamma * Math.log(1 + lambda * runtime / waittime * numTasks) - price * lambda * runtime * numTasks;
 	}
 	
 
 	/**
-	 * TODO
-	 * solve system arrival rate
-	 * @param gammas: arrays of individual jobs
-	 * @param phi
-	 * @param N
+	 * solution to system arrival rate
 	 * @return system arrival rate
 	 */
-	public static double systemArrivalRate(double[] gammas, double phi, int N){
-		return 0;
+	public static double systemArrivalRate(double gamma, double price, double runtime, double waittime, int numTasks, int numUsers){
+		return numUsers * (gamma - price * waittime)/(price * runtime * numTasks);
 	}
+
 	
 	/**
 	 * @param theta: The expected idle-to-runtime ratio of an instance’s usage
@@ -42,5 +39,8 @@ public class Utility {
 		else if (theta < 1 && theta >= 0.33333) return 0.15 * theta + 0.75;
 		else return 0.3 * theta + 0.7;
 	}
-	
+
+	public static double calculateProfitPerHour(double idleRatio, double cvspPrice, double gcpPrice, int numInstances){
+		return numInstances * (gcpPrice * getGCPDiscount(idleRatio) - cvspPrice) * (1/(idleRatio + 1));
+	}
 }

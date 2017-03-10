@@ -12,6 +12,7 @@ public class SingleTaskScheduler {
 	private PriorityQueue<Job> runningJobs; // an array of lists
 	private static Date currentTime; // currentTime of the scheduler
 
+
 	public static Date getCurrentTime() {
 		return currentTime;
 	}

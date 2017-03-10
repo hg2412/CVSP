@@ -2,16 +2,16 @@ package cvsp.models;
 
 public class ParetoRuntime {
 	private double alpha;
-	private double tau_min;
+	private double minTau;
 
 	/**
 	 * set parameter of the model
 	 * @param alpha - parameter of the model
-	 * @param tau_min - minimum runtime (in hours)
+	 * @param minTau - minimum runtime (in hours)
 	 */
-	public ParetoRuntime(double alpha, double tau_min) {
+	public ParetoRuntime(double alpha, double minTau) {
 		this.alpha = alpha;
-		this.tau_min = tau_min;
+		this.minTau = minTau;
 	}
 
 	/**
@@ -19,10 +19,13 @@ public class ParetoRuntime {
 	 */
 	public double getNextRuntime() {
 		double v = Math.random();
-		while (v == 0) {
-			v = Math.random();
-		}
-		return tau_min / Math.pow(v, 1.0 / alpha);
+
+		return minTau / Math.pow(v, 1/alpha);
+	}
+
+	public double getExpectedRuntime(){
+		return minTau * alpha / (alpha - 1);
+
 	}
 
 	/**

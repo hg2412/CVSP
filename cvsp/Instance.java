@@ -9,15 +9,16 @@ import java.util.Queue;
  */
 public class Instance {
     public int instanceId;
+    private int total;
     private Queue<Task> waitingTasks; // a queue of jobs
     private Task runningTask; //current running job
 
-    public void addTask(Task t){
+    public void addTask(Task t, Date date){
         if (runningTask != null){// the instance is busy
             waitingTasks.offer(t);
         }else{// the instance is available
             runningTask = t;
-            t.startTime = (Date) MultipleTaskScheduler.getCurrentTime().clone();
+            t.startTime = (Date) date.clone();
             t.endTime = new Date();
             runningTask.updateWaitTime();
             t.endTime.setTime(t.startTime.getTime() + t.runTime * 1000);
@@ -26,18 +27,9 @@ public class Instance {
 
     public LinkedList<Task> runTasks(Date time){
         LinkedList<Task> completedTasks = new LinkedList<Task>();
-        while(runningTask != null && runningTask.endTime.before(time)){
+        while(runningTask != null && (!runningTask.endTime.after(time))){
             completedTasks.add(runningTask);
-            if (!waitingTasks.isEmpty()){
-
-                waitingTasks.peek().startTime = (Date)runningTask.endTime.clone();
-                runningTask = waitingTasks.poll();
-                runningTask.endTime = new Date();
-                runningTask.endTime.setTime(runningTask.startTime.getTime() + runningTask.runTime * 1000);
-                runningTask.updateWaitTime();
-            }else{
-                runningTask = null;
-            }
+            runCurrentTask();
         }
         return completedTasks;
     }
@@ -50,20 +42,22 @@ public class Instance {
         LinkedList<Task> completedTasks = new LinkedList<Task>();
         while(runningTask != null){
             completedTasks.add(runningTask);
-            if (!waitingTasks.isEmpty()){
-                waitingTasks.peek().startTime = (Date)runningTask.endTime.clone();
-                runningTask = waitingTasks.poll();
-                runningTask.endTime = new Date();
-                runningTask.endTime.setTime(runningTask.startTime.getTime() + runningTask.runTime * 1000);
-                runningTask.updateWaitTime();
-            }else{
-                runningTask = null;
-            }
+            runCurrentTask();
         }
         return completedTasks;
     }
 
-
+    public void runCurrentTask(){
+        if (!waitingTasks.isEmpty()){
+            waitingTasks.peek().startTime = (Date)runningTask.endTime.clone();
+            runningTask = waitingTasks.poll();
+            runningTask.endTime = new Date();
+            runningTask.endTime.setTime(runningTask.startTime.getTime() + runningTask.runTime * 1000);
+            runningTask.updateWaitTime();
+        }else{
+            runningTask = null;
+        }
+    }
 
     /**
      *  is the instance available
@@ -76,21 +70,24 @@ public class Instance {
             return false;
     }
 
-    public int getTotalRuntime(){
-        int total = 0;
-
-        if (runningTask == null)
-            return 0;
-        else
-            total += runningTask.runTime;
-
-        for(Task t:waitingTasks)
-            total += t.runTime;
-        return total;
+    public int getWaitingJobsLength(){
+        return waitingTasks.size();
     }
 
     public Instance(int instanceId){
         this.instanceId = instanceId;
         waitingTasks = new LinkedList<Task>();
+    }
+
+    public void printInstance(){
+        System.out.println("Instance " + instanceId);
+        if (isAvailable())
+            System.out.println("No running Task:");
+        else{
+            System.out.println("Running Task:" + runningTask);
+            for(Task task:waitingTasks){
+                System.out.println("Waiting Task:" + task);
+            }
+        }
     }
 }
