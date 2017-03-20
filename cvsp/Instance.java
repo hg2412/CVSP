@@ -5,14 +5,30 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Created by Haoxiang on 2/16/17.
+ * Class of virtual machine instance
  */
 public class Instance {
-    public int instanceId;
-    private int total;
-    private Queue<Task> waitingTasks; // a queue of jobs
-    private Task runningTask; //current running job
 
+    public int instanceId;
+    private Queue<Task> waitingTasks; // a queue of waiting tasks
+    private Task runningTask; // current running task
+
+    /**
+     * constructor of the instance, and set instance id
+     * @param instanceId
+     */
+    public Instance(int instanceId){
+        this.instanceId = instanceId;
+        waitingTasks = new LinkedList<Task>();
+    }
+
+    /**
+     * add a task to the instance
+     * if the instance is available, add the task to be running task;
+     * if the instance is busy, add the task to the waiting queue
+     * @param t - task
+     * @param date - start time of the task
+     */
     public void addTask(Task t, Date date){
         if (runningTask != null){// the instance is busy
             waitingTasks.offer(t);
@@ -25,6 +41,11 @@ public class Instance {
         }
     }
 
+    /**
+     * Run tasks that complete before a given time
+     * @param time
+     * @return linked list of completed jobs
+     */
     public LinkedList<Task> runTasks(Date time){
         LinkedList<Task> completedTasks = new LinkedList<Task>();
         while(runningTask != null && (!runningTask.endTime.after(time))){
@@ -35,7 +56,7 @@ public class Instance {
     }
 
     /**
-     *  run all the tasks in the system
+     *  run all the tasks remaining in the system
      * @return completed tasks
      */
     public LinkedList<Task> runTasks(){
@@ -47,6 +68,11 @@ public class Instance {
         return completedTasks;
     }
 
+    /**
+     * run current task
+     * if the running task is null, fetch a task from waiting queue to be the running task
+     * else set running task to null
+     */
     public void runCurrentTask(){
         if (!waitingTasks.isEmpty()){
             waitingTasks.peek().startTime = (Date)runningTask.endTime.clone();
@@ -60,8 +86,8 @@ public class Instance {
     }
 
     /**
-     *  is the instance available
-     * @return
+     * Get if the instance is available
+     * @return true or false
      */
     public boolean isAvailable(){
         if (runningTask == null)
@@ -70,14 +96,14 @@ public class Instance {
             return false;
     }
 
+    /**
+     * get the length of the waiting queue
+     * @return
+     */
     public int getWaitingJobsLength(){
         return waitingTasks.size();
     }
 
-    public Instance(int instanceId){
-        this.instanceId = instanceId;
-        waitingTasks = new LinkedList<Task>();
-    }
 
     public void printInstance(){
         System.out.println("Instance " + instanceId);

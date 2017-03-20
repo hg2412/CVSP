@@ -7,10 +7,9 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
+ * Test cases to test Multiple Task Scheduler
  * Created by Haoxiang on 3/4/17.
  */
-
-
 
 public class MultipleTaskSchedulerTest {
     @Test
@@ -39,7 +38,7 @@ public class MultipleTaskSchedulerTest {
         scheduler.runTasks(currentTime);
         scheduler.printInstances();
 
-        // after 1 minutes, first three jobs should be completed
+        // after 1 minute, first three jobs should be completed
         scheduler.fastForwardTimeBySeconds(30);
         scheduler.runCurrentTasks();
         assert(scheduler.getTotalRuntime() == 180);

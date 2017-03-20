@@ -1,14 +1,24 @@
 package cvsp.models;
 
+/**
+ * This class uses poisson distribution to simulate jobs arrivals
+ */
 public class PoissonArrival {
+	/**
+	 * arrival rate
+	 */
 	public double rate;
-	
+
+	/**
+	 * constructor
+	 * @param rate
+	 */
 	public PoissonArrival(double rate) {
 		this.rate = rate;
 	}
 	
 	/**
-	 *  get next interarrival time (follows exponential dist)
+	 *  get next arrival time (follows exponential dist)
 	 * @return time of next arrival (hour)
 	 */
 	public double getNextArrivalTime(){
@@ -29,15 +39,6 @@ public class PoissonArrival {
             p = p * Math.random(); 
         } while (p > L); 
         return k - 1; 
-	}
-	
-	/**
-	 * TODO
-	 * @param data : empirical data of job arrivals
-	 * @return calibrated arrival rate
-	 */
-	public double calibrate(double[] data){
-		return 0;
 	}
 
 }

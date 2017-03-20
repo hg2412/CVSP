@@ -29,6 +29,7 @@ public class Utility {
 
 	
 	/**
+	 * calculate GCP usage dicount
 	 * @param theta: The expected idle-to-runtime ratio of an instance’s usage
 	 * @return w: Fraction of full price that the CVSP pays to GCP
 	 */
@@ -40,6 +41,14 @@ public class Utility {
 		else return 0.3 * theta + 0.7;
 	}
 
+	/**
+	 * Calculate CVSP profits per hour
+	 * @param idleRatio
+	 * @param cvspPrice
+	 * @param gcpPrice
+	 * @param numInstances
+	 * @return
+	 */
 	public static double calculateProfitPerHour(double idleRatio, double cvspPrice, double gcpPrice, int numInstances){
 		return numInstances * (gcpPrice * getGCPDiscount(idleRatio) - cvspPrice) * (1/(idleRatio + 1));
 	}

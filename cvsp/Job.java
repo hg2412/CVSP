@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 
 public class Job {
-	public Date start;
-	public Date end;
+	public Date start; // start time
+	public Date end;  //end time
     public int jobId;
     public int userId;
     public int runTime;  // in seconds
@@ -16,6 +16,12 @@ public class Job {
     public ArrayList<Task> tasks;
     public HashMap<Integer, Task> tasksHashMap = new HashMap<Integer, Task>();
 
+    /**
+     * constructor of job without setting userId, create a list and a map of tasks
+     * @param jobId
+     * @param numTasks
+     * @param runtime
+     */
     public Job(int jobId, int numTasks, int runtime){
         this.numTasks = numTasks;
         this.completedTasks = 0;
@@ -30,6 +36,13 @@ public class Job {
         }
     }
 
+    /**
+     * constructor of job, create a list and a map of tasks
+     * @param userId
+     * @param jobId
+     * @param numTasks
+     * @param runtime
+     */
     public Job(int userId, int jobId, int numTasks, int runtime){
         this.userId = userId;
         this.numTasks = numTasks;

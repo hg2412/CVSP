@@ -3,43 +3,30 @@ package cvsp;
 import java.util.*;
 
 /**
- * Created by Haoxiang on 2/16/17.
  * The task scheduler with multiple instances accepting jobs with multiple tasks
+ *
+ * To support simulation, the scheduler has its own timer
+ * You can use getCurrentTime and setCurrentTime to change the time of the scheduler
+ * You can also use fastForwardTimeByHours or fastForwardTimeBySeconds to adjust the time of the scheduler
+ *
+ * The scheduler also supports two policies to assign tasks to instances
+ *
  */
-
 public class MultipleTaskScheduler {
-    public int numInstances;
-    public ArrayList<Instance> instances;
-
-    private Date startTime;
+    public int numInstances; //number of instance
+    public ArrayList<Instance> instances; // list of instances
+    private Date startTime; // start time of the simulation
     private Date currentTime; // currentTime of the scheduler
-    double totalRuntime;
-    double totalWaitTime;
+    double totalRuntime; //total runtime since start of simulation
+    double totalWaitTime;  //total wait time since the start of simulation
+
+    /**
+     * two scheduling policy to assign tasks
+     * random - assign task to a random instance
+     * leastBusiest - assign task to the least busiest instance
+     */
     public enum SchedulePolicy{random, leastBusiest};
     private SchedulePolicy policy;
-
-    public Date getCurrentTime() {
-        return (Date) this.currentTime.clone();
-    }
-
-    public void setCurrentTime(Date currentTime) {
-        if (this.currentTime == null)
-            this.currentTime = new Date(currentTime.getTime());
-        else
-            this.currentTime.setTime(currentTime.getTime());
-    }
-
-    public Date getStartTime() {
-        return (Date) startTime.clone();
-    }
-
-    public void setStartTime(Date startTime)
-    {
-        if (this.startTime == null)
-            this.startTime = new Date(startTime.getTime());
-        else
-            this.startTime.setTime(startTime.getTime());
-    }
 
     /**
      * Constructor, create M instances for the scheduler
@@ -58,7 +45,48 @@ public class MultipleTaskScheduler {
     }
 
     /**
-     * assign a job's tasks to least busiest instances
+     * get current time of the scheduler
+     * @return
+     */
+    public Date getCurrentTime() {
+        return (Date) this.currentTime.clone();
+    }
+
+    /**
+     * set the current time of the scheduler
+     * @param currentTime
+     */
+    public void setCurrentTime(Date currentTime) {
+        if (this.currentTime == null)
+            this.currentTime = new Date(currentTime.getTime());
+        else
+            this.currentTime.setTime(currentTime.getTime());
+    }
+
+    /**
+     * get the start time of the scheduler
+     * @return
+     */
+    public Date getStartTime() {
+        return (Date) startTime.clone();
+    }
+
+    /**
+     * set the starttime of the scheduler
+     * @param startTime
+     */
+    public void setStartTime(Date startTime)
+    {
+        if (this.startTime == null)
+            this.startTime = new Date(startTime.getTime());
+        else
+            this.startTime.setTime(startTime.getTime());
+    }
+
+
+
+    /**
+     * assign a job's tasks according to given policy
      * @return
      */
     public boolean addJob(Job job, SchedulePolicy policy) {
@@ -85,7 +113,7 @@ public class MultipleTaskScheduler {
     /**
      * run tasks that complete before given time, and return completed jobs
      * @param time
-     * @return
+     * @return linkedlist of completed tasks
      */
     public LinkedList<Task> runTasks(Date time){
         LinkedList<Task> completedTasks = new LinkedList<Task>();
@@ -101,7 +129,7 @@ public class MultipleTaskScheduler {
 
     /**
      * run tasks that complete before given time, and return completed jobs
-     * @return
+     * @return linkedlist of completed tasks
      */
     public LinkedList<Task> runCurrentTasks(){
         LinkedList<Task> completedTasks = new LinkedList<Task>();
@@ -118,7 +146,7 @@ public class MultipleTaskScheduler {
 
     /**
      * run all tasks remaining in the system
-     * @return
+     * @return linkedlist of completed tasks
      */
     public LinkedList<Task> runAllTasks(){
         LinkedList<Task> completedTasks = new LinkedList<Task>();
@@ -148,10 +176,18 @@ public class MultipleTaskScheduler {
         return bestInstance;
     }
 
+    /**
+     * get the idle to runtime ratio of the scheduler
+     * @return
+     */
     public double getIdleRatio(){
         return 1/getUtilizationRate() - 1;
     }
 
+    /**
+     * get the utilization rate of the scheduler
+     * @return
+     */
     public double getUtilizationRate(){
         long diff = (this.currentTime.getTime() - this.startTime.getTime());
         double totalTime = diff / 1000 * this.numInstances;
@@ -160,6 +196,10 @@ public class MultipleTaskScheduler {
     }
 
 
+    /**
+     * get total runtime of all instances
+     * @return total runtime in seconds
+     */
     public double getTotalRuntime(){
         return totalRuntime;
     }
@@ -167,6 +207,9 @@ public class MultipleTaskScheduler {
         return totalWaitTime;
     }
 
+    /**
+     * print status of instances
+     */
     public void printInstances(){
         System.out.println("\nStartTime: " + startTime);
         System.out.println("CurrentTime" + currentTime);
@@ -175,15 +218,28 @@ public class MultipleTaskScheduler {
         }
     }
 
+    /**
+     * fast forward the current time of the system by seconds
+     * @param seconds
+     */
     public void fastForwardTimeBySeconds(int seconds){
         this.currentTime.setTime(currentTime.getTime() + (long)seconds * 1000);
     }
 
+    /**
+     * fast forward the current time of the system by hours
+     * @param hours
+     */
     public void fastForwardTimeByHours(double hours){
         this.currentTime.setTime(currentTime.getTime() + (long)Math.ceil(hours * 3600 * 1000));
     }
 
+    /**
+     * get current runtime to waitime ratio of the system
+     * @return
+     */
     public double getRuntimeWaittimeRatio(){
+        if (totalWaitTime < 1e-10) return (double)Integer.MAX_VALUE;
         return totalRuntime/ totalWaitTime;
     }
 

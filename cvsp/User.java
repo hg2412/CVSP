@@ -11,8 +11,8 @@ public class User {
     public String username;
     public int userId;
     public double arrivalRate;
-    public int numTasks;
-    public double gamma;
+    public int numTasks = 1;
+    public double gamma = 9;
     public int totalRuntime = 0;
     public int totalWaittime = 0;
     public LinkedList<Job> jobs;
@@ -67,6 +67,18 @@ public class User {
         return user.createJob(runtime);
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", userId=" + userId +
+                ", arrivalRate=" + arrivalRate +
+                ", numTasks=" + numTasks +
+                ", gamma=" + gamma +
+                ", totalRuntime=" + totalRuntime +
+                ", totalWaittime=" + totalWaittime +
+                '}';
+    }
 
     public static LinkedList<User> generateUsers(int numUsers, int numTasks, double arrivalRate, double gamma){
         LinkedList<User> users = new LinkedList<User>();

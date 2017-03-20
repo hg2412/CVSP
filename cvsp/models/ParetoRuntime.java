@@ -1,11 +1,24 @@
 package cvsp.models;
 
+/**
+ * This class uses Pareto Distribution to simulate the runtime of user's task
+ */
 public class ParetoRuntime {
-	private double alpha;
-	private double minTau;
+	/**
+	 * default model parameters
+	 */
+	protected double alpha = 1.01;
+	protected double minTau = 1.0 / 6; // in hours
 
 	/**
-	 * set parameter of the model
+	 * constructor using default parameter
+	 */
+	public ParetoRuntime(){
+		;
+	}
+
+	/**
+	 * constructor that sets parameters of the model
 	 * @param alpha - parameter of the model
 	 * @param minTau - minimum runtime (in hours)
 	 */
@@ -15,26 +28,21 @@ public class ParetoRuntime {
 	}
 
 	/**
-	 * TODO: modify to be the piecewise Pareto Distribution in the paper
+	 * get the next random runtime
+	 * @return
 	 */
 	public double getNextRuntime() {
 		double v = Math.random();
-
 		return minTau / Math.pow(v, 1/alpha);
 	}
 
+	/**
+	 * get the expected runtime
+	 * @return
+	 */
 	public double getExpectedRuntime(){
 		return minTau * alpha / (alpha - 1);
 
-	}
-
-	/**
-	 * TODO
-	 * @param data - empirical data of job runtime
-	 * @return fit runtime
-	 */
-	public double fit(double[] data) {
-		return 0;
 	}
 
 }
