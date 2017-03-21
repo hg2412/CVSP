@@ -18,7 +18,7 @@ public class User {
     public LinkedList<Job> jobs;
     public HashMap<Integer, Job> jobsHashMap;
 
-    public User(String username, int userId, int numTasks, double arrivalRate, double gamma){
+    public User(String username, int userId, int numTasks, double arrivalRate, double gamma) {
         this.username = username;
         this.userId = userId;
         this.numTasks = numTasks;
@@ -28,27 +28,27 @@ public class User {
         jobsHashMap = new HashMap<Integer, Job>();
     }
 
-    public void createJob(int jobId, int numTasks, int runtime){
+    public void createJob(int jobId, int numTasks, int runtime) {
         Job job = new Job(jobId, numTasks, runtime);
         this.jobs.add(job);
         this.jobsHashMap.put(job.jobId, job);
     }
 
-    public void createJob(int numTasks, int runtime){
+    public void createJob(int numTasks, int runtime) {
         Job job = new Job(userId, this.jobs.size() + 1, numTasks, runtime);
         this.jobs.add(job);
         this.jobsHashMap.put(job.jobId, job);
     }
 
-    public Job createJob(int runtime){
+    public Job createJob(int runtime) {
         Job job = new Job(this.userId, this.jobs.size() + 1, this.numTasks, runtime);
         this.jobs.add(job);
         this.jobsHashMap.put(job.jobId, job);
         return job;
     }
 
-    public double getRuntimeToWaittimeRatio(){
-        return totalRuntime/totalWaittime;
+    public double getRuntimeToWaittimeRatio() {
+        return totalRuntime / totalWaittime;
     }
 
 
@@ -59,10 +59,10 @@ public class User {
         double cdf = 0;
         double threshold = Math.random();
         int idx = 0;
-        do{
+        do {
             cdf += users.get(idx).arrivalRate / totalRate;
             idx++;
-        }while(idx < users.size() && cdf < threshold);
+        } while (idx < users.size() && cdf < threshold);
         User user = users.get(idx - 1);
         return user.createJob(runtime);
     }
@@ -80,10 +80,10 @@ public class User {
                 '}';
     }
 
-    public static LinkedList<User> generateUsers(int numUsers, int numTasks, double arrivalRate, double gamma){
+    public static LinkedList<User> generateUsers(int numUsers, int numTasks, double arrivalRate, double gamma) {
         LinkedList<User> users = new LinkedList<User>();
-        for(int i = 0; i < numUsers; i++){
-            users.add(new User(Integer.toString(i),i,numTasks, arrivalRate, gamma));
+        for (int i = 0; i < numUsers; i++) {
+            users.add(new User(Integer.toString(i), i, numTasks, arrivalRate, gamma));
         }
         return users;
     }

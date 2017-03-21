@@ -5,11 +5,11 @@ package cvsp.models;
  */
 
 
-public class GeneralizedParetoRuntime extends ParetoRuntime{
+public class GeneralizedParetoRuntime extends ParetoRuntime {
     /**
      * default parameters are parameters used in the paper for the 0 priority group
      */
-    private double tauMin = 1.0/6;
+    private double tauMin = 1.0 / 6;
     private double tauHat = 24;
     private double alpha = 1.01;
     private double sigma = 21187.83;
@@ -24,12 +24,13 @@ public class GeneralizedParetoRuntime extends ParetoRuntime{
     /**
      * constructor using default parameter in the papaer
      */
-    public GeneralizedParetoRuntime(){
+    public GeneralizedParetoRuntime() {
         ;
     }
 
     /**
      * Constructor - set parameters
+     *
      * @param tauMin
      * @param tauHat
      * @param alpha
@@ -48,23 +49,25 @@ public class GeneralizedParetoRuntime extends ParetoRuntime{
 
     /**
      * get next random runtime using Inverse Transformation Method
+     *
      * @return
      */
-    public double getNextRuntime(){
+    public double getNextRuntime() {
         double u = Math.random();
         return inverseCDF(u);
     }
 
     /**
      * inverse cdf function
+     *
      * @param u
      * @return
      */
-    public double inverseCDF(double u){
+    public double inverseCDF(double u) {
         double low = tauMin;
-        double high = (double)Integer.MAX_VALUE;
+        double high = (double) Integer.MAX_VALUE;
         double mid = tauMin;
-        while(Math.abs(cdf(mid) - u) > errorThreshold){
+        while (Math.abs(cdf(mid) - u) > errorThreshold) {
             mid = (low + high) / 2;
             if (cdf(mid) < u)
                 low = mid;
@@ -76,34 +79,35 @@ public class GeneralizedParetoRuntime extends ParetoRuntime{
 
     /**
      * CDF function
+     *
      * @param tau
      * @return
      */
-    public double cdf(double tau){
+    public double cdf(double tau) {
         if (tau < tauMin)
             return 0;
         else if (tau >= tauMin && tau < tauHat)
             return 1 - Math.pow(tauMin / tau, alpha);
         else
-            return 1 - Math.pow(tauMin / tauHat, alpha) + Math.pow(1 + delta * (tauHat - mu)/sigma, -1/delta) - Math.pow(1 + delta * (tau - mu)/sigma, -1/delta);
+            return 1 - Math.pow(tauMin / tauHat, alpha) + Math.pow(1 + delta * (tauHat - mu) / sigma, -1 / delta) - Math.pow(1 + delta * (tau - mu) / sigma, -1 / delta);
     }
 
     /**
      * testing
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         GeneralizedParetoRuntime model = new GeneralizedParetoRuntime();
         //test cdf and inverse cdf
-        for(int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             double cdf = model.cdf(i * 0.1);
             double tau = model.inverseCDF(cdf);
-            assert(Math.abs(tau - i * 0.1) > 1e-4);
+            assert (Math.abs(tau - i * 0.1) > 1e-4);
         }
         //test random
         double mean = 0;
-        for(int i = 0; i < 10000; i++) {
-            mean = mean * i/(i+1);
-            mean += model.getNextRuntime() /(i+1);
+        for (int i = 0; i < 10000; i++) {
+            mean = mean * i / (i + 1);
+            mean += model.getNextRuntime() / (i + 1);
         }
         System.out.println("mean = " + mean);
     }

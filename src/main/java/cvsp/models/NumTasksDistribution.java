@@ -7,32 +7,34 @@ package cvsp.models;
 public class NumTasksDistribution {
     private double p = 0.5; // p parameter for geometric distribution (E(num of task) = 1/p)
 
-    public NumTasksDistribution(double p){
+    public NumTasksDistribution(double p) {
         this.p = p;
     }
 
     /**
      * get the next random number of the task
+     *
      * @return
      */
-    public int getNextNumOfTasks(){
-        return (int)(Math.ceil(Math.log(Math.random())/Math.log(1.0-p)));
+    public int getNextNumOfTasks() {
+        return (int) (Math.ceil(Math.log(Math.random()) / Math.log(1.0 - p)));
     }
 
     /**
      * Testing using Law of Large Number
+     *
      * @param args
      */
-    public static void main(String[] args){
-        NumTasksDistribution numTasksDistribution = new NumTasksDistribution(1.0/3);
+    public static void main(String[] args) {
+        NumTasksDistribution numTasksDistribution = new NumTasksDistribution(1.0 / 3);
         double mean = 0;
-        for(int i = 0; i < 10000; i++){
-            mean = mean * 1.0 * i * 1.0/(i+1);
+        for (int i = 0; i < 10000; i++) {
+            mean = mean * 1.0 * i * 1.0 / (i + 1);
             int numTask = numTasksDistribution.getNextNumOfTasks();
-            mean += numTask * 1.0/(i+1);
+            mean += numTask * 1.0 / (i + 1);
         }
         System.out.println("Mean = " + mean);
-        assert(Math.abs(mean - 3.0) < 0.1);
+        assert (Math.abs(mean - 3.0) < 0.1);
     }
 
 }

@@ -45,7 +45,7 @@ public class Simulator {
             currentTime.setTime(nextArrivalTime.getTime());
             SingleTaskScheduler.setCurrentTime(currentTime);
             // create a new job and add to waiting jobs
-            Job job = new Job( i ,1, (int) Math.ceil(runtime * hourToSeconds));
+            Job job = new Job(i, 1, (int) Math.ceil(runtime * hourToSeconds));
             job.start = (Date) currentTime.clone();
             scheduler.addJob(job);
             scheduler.assignJob();
@@ -58,13 +58,14 @@ public class Simulator {
 
     /**
      * simulate the single user multiple-task job arrivals using Possion model and Pareto model and CVSP's schedulers
+     *
      * @param startDate:      starting date of the simulation
      * @param numJobs:        number of jobs to simulate
      * @param numInstances:   number of instances of CVSP
      * @param poissonArrival: Poisson Arrival Model
      * @param paretoRuntime:  Pareto Runtime Model
      */
-    public static void simulateSingleUserMultipleTasksByJobsNum(Date startDate, int numJobs, int numTasks, int numInstances, PoissonArrival poissonArrival, ParetoRuntime paretoRuntime, boolean writeToCSV) {
+    public static double simulateSingleUserMultipleTasksByJobsNum(Date startDate, int numJobs, int numTasks, int numInstances, PoissonArrival poissonArrival, ParetoRuntime paretoRuntime, boolean writeToCSV) {
         MultipleTaskScheduler scheduler = new MultipleTaskScheduler(numInstances);
         currentTime = (Date) startDate.clone();
         scheduler.setCurrentTime(new Date(currentTime.getTime()));
@@ -90,12 +91,15 @@ public class Simulator {
         if (writeToCSV)
             writeCompletedTasks(startDate.toString(), completedTasks);
 
+        return scheduler.getUtilizationRate();
+
     }
 
     /**
      * simulate the single user multiple-task job arrivals using Possion model and Pareto model and CVSP's schedulers
+     *
      * @param startDate:      starting date of the simulation
-     * @param numHours:        number of hours to simulate
+     * @param numHours:       number of hours to simulate
      * @param numInstances:   number of instances of CVSP
      * @param poissonArrival: Poisson Arrival Model
      * @param paretoRuntime:  Pareto Runtime Model
@@ -118,7 +122,7 @@ public class Simulator {
             scheduler.fastForwardTimeByHours(arrivalTime);
             // run previous jobs
             LinkedList<Task> completedTasks = scheduler.runCurrentTasks();
-            if(writeToCSV)
+            if (writeToCSV)
                 writeCompletedTasks(startDate.toString(), completedTasks);
             Job job = new Job(jobCount, numTasks, (int) Math.ceil(runtime * hourToSeconds));
             jobCount++;
@@ -134,8 +138,9 @@ public class Simulator {
 
     /**
      * simulate the single user multiple-task job arrivals using Possion model and Pareto model and CVSP's schedulers
+     *
      * @param startDate:      starting date of the simulation
-     * @param numHours:    number of hours to simulate
+     * @param numHours:       number of hours to simulate
      * @param numInstances:   number of instances of CVSP
      * @param poissonArrival: Poisson Arrival Model
      * @param paretoRuntime:  Pareto Runtime Model
@@ -158,7 +163,7 @@ public class Simulator {
             scheduler.fastForwardTimeByHours(arrivalTime);
             // run previous jobs
             LinkedList<Task> completedTasks = scheduler.runCurrentTasks();
-            if(writeToCSV)
+            if (writeToCSV)
                 writeCompletedTasks(startDate.toString(), completedTasks);
             Job job = new Job(jobCount, numTasksDist.getNextNumOfTasks(), (int) Math.ceil(runtime * hourToSeconds));
             jobCount++;
@@ -171,18 +176,19 @@ public class Simulator {
 
     /**
      * simulate multiple user multiple-task job arrivals using Possion model and Pareto model and CVSP's schedulers.
-     * @param startDate starting date of the simulation
-     * @param users linkedlist of users
-     * @param numJobs number of jobs to simulate
-     * @param numInstances number of instances
+     *
+     * @param startDate     starting date of the simulation
+     * @param users         linkedlist of users
+     * @param numJobs       number of jobs to simulate
+     * @param numInstances  number of instances
      * @param paretoRuntime pareto runtime distribution
      * @param writeToCSV
      */
-    public static void simulateMultipleUserMultipleTasksByJobsNum(Date startDate, List<User> users, int numJobs, int numInstances, ParetoRuntime paretoRuntime, boolean writeToCSV) {
+    public static double simulateMultipleUserMultipleTasksByJobsNum(Date startDate, List<User> users, int numJobs, int numInstances, ParetoRuntime paretoRuntime, boolean writeToCSV) {
         MultipleTaskScheduler scheduler = new MultipleTaskScheduler(numInstances);
         currentTime = (Date) startDate.clone();
         double arrivalRate = 0;
-        for(User user:users)
+        for (User user : users)
             arrivalRate += user.arrivalRate;
         PoissonArrival poissonArrival = new PoissonArrival(arrivalRate);
 
@@ -197,7 +203,7 @@ public class Simulator {
             if (writeToCSV)
                 writeCompletedTasks(startDate.toString(), completedTasks);
             // create a new job and add to waiting jobs
-            Job job = User.generateJobFromMultipleUsers(users, (int)Math.ceil(runtime * hourToSeconds));
+            Job job = User.generateJobFromMultipleUsers(users, (int) Math.ceil(runtime * hourToSeconds));
             scheduler.addJob(job, MultipleTaskScheduler.SchedulePolicy.leastBusiest);
             System.out.println("Utilization Rate: " + scheduler.getUtilizationRate());
             System.out.println("Runtime to Waittime Ratio: " + scheduler.getRuntimeWaittimeRatio());
@@ -208,22 +214,25 @@ public class Simulator {
         LinkedList<Task> completedTasks = scheduler.runAllTasks();
         if (writeToCSV)
             writeCompletedTasks(startDate.toString(), completedTasks);
+
+        return scheduler.getUtilizationRate();
     }
 
     /**
      * simulate the multiple user multiple-task job arrivals using Possion model and Pareto model and CVSP's schedulers
-     * @param startDate:      starting date of the simulation
-     * @param numHours:    number of hours to simulate
-     * @param numInstances:   number of instances of CVSP
-     * @param paretoRuntime:  Pareto Runtime Model
-     * @param writeToCSV:  write to csv?
+     *
+     * @param startDate:     starting date of the simulation
+     * @param numHours:      number of hours to simulate
+     * @param numInstances:  number of instances of CVSP
+     * @param paretoRuntime: Pareto Runtime Model
+     * @param writeToCSV:    write to csv?
      */
-    public static void simulateMultipleUserMultipleTasksByHours(Date startDate, List<User> users, int numHours, int numInstances, ParetoRuntime paretoRuntime, boolean writeToCSV) throws IOException {
+    public static double simulateMultipleUserMultipleTasksByHours(Date startDate, List<User> users, int numHours, int numInstances, ParetoRuntime paretoRuntime, boolean writeToCSV) throws IOException {
         MultipleTaskScheduler scheduler = new MultipleTaskScheduler(numInstances);
         currentTime = (Date) startDate.clone();
         double arrivalRate = 0;
         HashMap<Integer, User> usersHashMap = new HashMap<Integer, User>();
-        for(User user:users) {
+        for (User user : users) {
             arrivalRate += user.arrivalRate;
             usersHashMap.put(user.userId, user);
         }
@@ -242,7 +251,7 @@ public class Simulator {
                 writeCompletedTasks(startDate.toString(), completedTasks);
             updateUserData(usersHashMap, completedTasks);
             // create a new job and add to waiting jobs
-            Job job = User.generateJobFromMultipleUsers(users, (int)Math.ceil(runtime * hourToSeconds));
+            Job job = User.generateJobFromMultipleUsers(users, (int) Math.ceil(runtime * hourToSeconds));
             scheduler.addJob(job, MultipleTaskScheduler.SchedulePolicy.leastBusiest);
             writeSchedulerStatus(startDate.toString() + "System Utilization and Idle Ratio.csv", scheduler);
         }
@@ -254,17 +263,19 @@ public class Simulator {
         LinkedList<Task> completedTasks = scheduler.runAllTasks();
         if (writeToCSV)
             writeCompletedTasks(startDate.toString(), completedTasks);
+        return scheduler.getUtilizationRate();
     }
 
     /**
      * write users info
+     *
      * @param filename
      * @param users
      * @throws IOException
      */
     public static void writeUserData(String filename, List<User> users) throws IOException {
         FileWriter writer = new FileWriter(filename, true);
-        for(User user:users){
+        for (User user : users) {
             writer.write(user + "\n");
         }
         writer.close();
@@ -279,8 +290,8 @@ public class Simulator {
     }
 
 
-    public static void updateUserData(HashMap<Integer, User> usersHashMap, LinkedList<Task> completedTasks){
-        for(Task task:completedTasks){
+    public static void updateUserData(HashMap<Integer, User> usersHashMap, LinkedList<Task> completedTasks) {
+        for (Task task : completedTasks) {
             usersHashMap.get(task.userId).totalRuntime += task.runTime;
             usersHashMap.get(task.userId).totalWaittime += task.waitTime;
         }
@@ -305,6 +316,14 @@ public class Simulator {
         }
     }
 
+
+    /**
+     * write job to csv
+     *
+     * @param filename
+     * @param job
+     * @throws IOException
+     */
     public static void writeJobToCSV(String filename, Job job) throws IOException {
         FileWriter writer = new FileWriter(filename, true);
         StringBuilder sb = new StringBuilder();
@@ -321,6 +340,7 @@ public class Simulator {
 
     /**
      * write job log to csv file
+     *
      * @param filename
      * @param task
      * @throws IOException
@@ -343,8 +363,13 @@ public class Simulator {
         return;
     }
 
-
-    public static void writeCompletedJobsToCSV(String filename, LinkedList<Job> completedJobs){
+    /**
+     * write completed jobs to csv
+     *
+     * @param filename
+     * @param completedJobs
+     */
+    public static void writeCompletedJobsToCSV(String filename, LinkedList<Job> completedJobs) {
         if (completedJobs.size() > 0) {
             for (Job job : completedJobs) {
                 try {
@@ -358,10 +383,6 @@ public class Simulator {
 
     public static void main(String[] args) throws IOException {
 
-        // simulate single task, single user job
-        //Simulator.simulate(new Date(), 1200, 10, new PoissonArrival(60), new ParetoRuntime(1,0.1));
-        // simulate multiple task, single user job
-        //Simulator.simulate(new Date(), 10, 10, 10, new PoissonArrival(60), new ParetoRuntime(0.4,0.01));
         // simulate multiple task, single user job
         //simulateSingleUserMultipleTasksByJobsNum(new Date(),1000,1,61, new PoissonArrival(60),new ParetoRuntime(2, 0.5));
 
@@ -369,7 +390,7 @@ public class Simulator {
         //LinkedList<User> users = User.generateUsers(60, 1, 1, 0);
         //simulateMultipleUserMultipleTasksByJobsNum(new Date(), users, 5000, 60, new ParetoRuntime(2, 0.5), false);
         //simulateMultipleUserMultipleTasksByHours(new Date(), users, 300, 60, new ParetoRuntime(2, 0.5), false);
-        experiment();
+        //experiment();
         //experiment();
     }
 
@@ -390,25 +411,27 @@ public class Simulator {
                         {41.36, 41.87, 42.39, 42.44, 42.68},
                         {41.65, 42.16, 42.69, 42.74, 42.98}
                 };
-        double[][] results = new double[3][5];
+        double[][] profits = new double[3][5];
 
         int hours = 1000;
 
         for (int i = 0; i < prices.length; i++) {
             for (int j = 0; j < numInstances.length; j++) {
                 System.out.println("p=" + prices[i] + " M=" + numInstances[j] + " Rates=" + rates[i][j]);
-                double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0/numTasks[i][j]), numInstances[j], new PoissonArrival(rates[i][j]), new GeneralizedParetoRuntime(), false);
-                results[i][j] = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
-                System.out.println("Profit: " + results[i][j]);
+                double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / numTasks[i][j]), numInstances[j], new PoissonArrival(rates[i][j]), new GeneralizedParetoRuntime(), false);
+                profits[i][j] = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
+                System.out.println("Profit: " + profits[i][j] + "\n");
             }
         }
 
-        for (int i = 0; i < prices.length; i++) {
-            int j = 0;
-            for (j = 0; j < numTasks[0].length - 1; j++) {
-                System.out.print(results[i][j] + " ");
-            }
-            System.out.print(results[i][j] + "\n");
-        }
+        /**
+         for (int i = 0; i < prices.length; i++) {
+         int j = 0;
+         for (j = 0; j < numTasks[0].length - 1; j++) {
+         System.out.print(results[i][j] + " ");
+         }
+         System.out.print(results[i][j] + "\n");
+         }
+         */
     }
 }

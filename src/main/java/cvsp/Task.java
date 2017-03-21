@@ -18,28 +18,28 @@ public class Task {
     public int runTime = 0;
     public Status status = Status.created;
 
-    public enum Status{
+    public enum Status {
         created, submitted, running, completed, aborted
     }
 
-    public Task(int jobId, int taskId, int runTime){
+    public Task(int jobId, int taskId, int runTime) {
         this.jobId = jobId;
         this.taskId = taskId;
         this.runTime = runTime;
     }
 
-    public Task(int userId, int jobId, int taskId, int runTime){
+    public Task(int userId, int jobId, int taskId, int runTime) {
         this.userId = userId;
         this.jobId = jobId;
         this.taskId = taskId;
         this.runTime = runTime;
     }
 
-    public void updateWaitTime(){
-        this.waitTime = (int)Math.round((this.startTime.getTime() - this.submitTime.getTime())/1000);
+    public void updateWaitTime() {
+        this.waitTime = (int) Math.round((this.startTime.getTime() - this.submitTime.getTime()) / 1000);
     }
 
-    public void run(){
+    public void run() {
     }
 
     @Override
