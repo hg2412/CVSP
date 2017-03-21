@@ -128,8 +128,6 @@ public class Simulator {
             jobCount++;
             scheduler.addJob(job, MultipleTaskScheduler.SchedulePolicy.leastBusiest);
         }
-        System.out.println();
-        System.out.println("Idle Ratio: " + scheduler.getIdleRatio());
         return scheduler.getUtilizationRate();
 
 
@@ -169,7 +167,6 @@ public class Simulator {
             jobCount++;
             scheduler.addJob(job, MultipleTaskScheduler.SchedulePolicy.random);
         }
-        System.out.println("Idle Ratio: " + scheduler.getIdleRatio());
         return scheduler.getUtilizationRate();
     }
 

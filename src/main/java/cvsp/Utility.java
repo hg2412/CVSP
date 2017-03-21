@@ -53,7 +53,6 @@ public class Utility {
      * @return
      */
     public static double calculateProfitPerHour(double idleRatio, double cvspPrice, double gcpPrice, int numInstances) {
-        System.out.println(getGCPDiscount(idleRatio));
         return numInstances * (cvspPrice - gcpPrice * getGCPDiscount(idleRatio)) * (1.0 / (idleRatio + 1.0));
     }
 
