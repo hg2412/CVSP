@@ -23,9 +23,9 @@ You can choose to run demo simulation or your customized simulation
 #### Customized Simulation  
 You can choose from three type of simulations  
 You will be asked to enter parameters needed.
-![Image of Customized Simulation](images/singleUserFixedNumTasks.png)  
+![Image of Customized Simulation](images/singleUserFixedNumTasks1.png)  
 ......
-![Image of Customized Simulation2](images/singleUserFixedNumTasks2.png)
+![Image of Customized Simulation2](images/singleUserFixedNumTasks 2.png)
 
 The program will show the submit time, start time, end time, runtime and waitting of each task.
 CSV file of each record will also be generated at the same directory of the program.
