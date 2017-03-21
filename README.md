@@ -25,7 +25,7 @@ You can choose from three type of simulations
 You will be asked to enter parameters needed.
 ![Image of Customized Simulation](images/singleUserFixedNumTasks1.png)  
 ......
-![Image of Customized Simulation2](images/singleUserFixedNumTasks 2.png)
+![Image of Customized Simulation2](images/singleUserFixedNumTasks2.png)
 
 The program will show the submit time, start time, end time, runtime and waitting of each task.
 CSV file of each record will also be generated at the same directory of the program.
@@ -34,6 +34,6 @@ CSV file of each record will also be generated at the same directory of the prog
 CVSP Package contains basic classes required by simulations.  
 ![Image of Code Structure](images/diagram.png)  
 
-models package contains stochastic models for simulations
+models package contains stochastic models for simulations  
 ![Image of Code Structure](images/model-diagram.png)  
 
