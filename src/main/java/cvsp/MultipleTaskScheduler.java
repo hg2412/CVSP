@@ -18,6 +18,7 @@ public class MultipleTaskScheduler {
     private Date currentTime; // currentTime of the scheduler
     double totalRuntime; //total runtime since start of simulation
     double totalWaitTime;  //total wait time since the start of simulation
+    int totalTasks = 0;
 
     /**
      * two scheduling policy to assign tasks
@@ -130,6 +131,7 @@ public class MultipleTaskScheduler {
         for (Task task : completedTasks) {
             this.totalRuntime += task.runTime;
             this.totalWaitTime += task.waitTime;
+            this.totalTasks += 1;
         }
         return completedTasks;
     }
@@ -148,6 +150,7 @@ public class MultipleTaskScheduler {
             this.totalRuntime += task.runTime;
             this.totalWaitTime += task.waitTime;
             task.status = Task.Status.completed;
+            this.totalTasks += 1;
 
         }
         return completedTasks;
@@ -259,6 +262,15 @@ public class MultipleTaskScheduler {
     public double getRuntimeWaittimeRatio() {
         if (totalWaitTime < 1e-10) return (double) Integer.MAX_VALUE;
         return totalRuntime / totalWaitTime;
+    }
+
+
+    /**
+     * get expected waitime
+     * @return
+     */
+    public double getExpectedWaittime() {
+        return totalWaitTime * 1.0 / totalTasks;
     }
 
 }
