@@ -1,4 +1,4 @@
-## Cloud Virtual Service Provider Project
+## Cloud Virtual Service Provider (CVSP)
 
 ### How to Install and Compile
 #### Install Java 8  
@@ -9,7 +9,7 @@ Please refer to https://maven.apache.org/install.html
 
 #### Compile  
 In command line, enter  
-`mvn clean package`  
+`mvn clean compile assembly:single`  
 After compiling finished, you can find the jar file in target folder.
 
 ### How to Run  
