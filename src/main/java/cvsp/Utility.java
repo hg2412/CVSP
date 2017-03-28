@@ -1,5 +1,5 @@
 package cvsp;
-
+import org.apache.commons.math3.special.Gamma;
 /**
  * @author Haoxiang
  *         <p>
@@ -21,11 +21,32 @@ public class Utility {
 
     /**
      * solution to system arrival rate
-     *
      * @return system arrival rate
      */
     public static double systemArrivalRate(double gamma, double price, double runtime, double waittime, int numTasks, int numUsers) {
         return numUsers * (gamma - price * waittime) / (price * runtime * numTasks);
+    }
+
+    /**
+     * get number of instances lower bound that satisfy finite expected waittime
+     *
+     */
+    public static int getNumInstancesBound(double systemArrivalRate, double numTasks, double alpha, double tauMin){
+        return (int)Math.ceil(alpha * numTasks * systemArrivalRate * tauMin / (alpha - 1));
+
+    }
+
+    /**
+     * calculate the instance arrival rate
+     * @param arrivalRate - instance arrival rate
+     * @param alpha
+     * @param tauMin
+     * @return
+     */
+    public static double expectedWaittime(double arrivalRate, double alpha, double tauMin){
+        double gamma = Gamma.regularizedGammaQ(-alpha, arrivalRate * tauMin) * Gamma.gamma(-alpha);
+        System.out.println(gamma);
+        return (1.0 / arrivalRate) * Math.log((alpha * Math.pow(arrivalRate * tauMin, alpha) * gamma)/(1.0 - alpha * tauMin * arrivalRate / (alpha - 1)));
     }
 
 
@@ -54,6 +75,12 @@ public class Utility {
      */
     public static double calculateProfitPerHour(double idleRatio, double cvspPrice, double gcpPrice, int numInstances) {
         return numInstances * (cvspPrice - gcpPrice * getGCPDiscount(idleRatio)) * (1.0 / (idleRatio + 1.0));
+    }
+
+
+    public static double getExpectedIdleToRuntimeRatio(double arrivalRate, double alpha, double tauMin){
+        double gamma = Gamma.gamma(-alpha - 1) * Gamma.regularizedGammaQ(-alpha -1, arrivalRate * tauMin);
+        return alpha * Math.pow( arrivalRate * tauMin, alpha) * gamma;
     }
 
 

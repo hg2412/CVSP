@@ -66,7 +66,7 @@ public class UserInterface {
         System.out.println("GCP Price: ");
         double gcpPrice = scan.nextDouble();
 
-        double utilization = simulateSingleUserMultipleTasksByHours(new Date(), numHours, numTasks, numInstances, new PoissonArrival(arrivalRate), new GeneralizedParetoRuntime(), true);
+        double utilization = simulateSingleUserMultipleTasksByHours(new Date(), numHours, numTasks, numInstances, new PoissonArrival(arrivalRate), new GeneralizedParetoRuntime(), true).utilization;
         double idleRatio = Utility.convertUtiliztionToIdleRatio(utilization);
         System.out.println("Idle Ratio: " + idleRatio);
         double profitPerHour = Utility.calculateProfitPerHour(idleRatio, price, gcpPrice, numInstances);
@@ -88,7 +88,7 @@ public class UserInterface {
         System.out.println("GCP Price: ");
         double gcpPrice = scan.nextDouble();
 
-        double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), numHours, new NumTasksDistribution(1.0 / numTasks), numInstances, new PoissonArrival(arrivalRate), new GeneralizedParetoRuntime(), true);
+        double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), numHours, new NumTasksDistribution(1.0 / numTasks), numInstances, new PoissonArrival(arrivalRate), new GeneralizedParetoRuntime(), true).utilization;
         double idleRatio = Utility.convertUtiliztionToIdleRatio(utilization);
         System.out.println("Idle Ratio: " + idleRatio);
         double profitPerHour = Utility.calculateProfitPerHour(idleRatio, price, gcpPrice, numInstances);
@@ -113,7 +113,7 @@ public class UserInterface {
         double gcpPrice = scan.nextDouble();
 
         LinkedList<User> users = User.generateUsers(numUsers, numTasks, arrivalRate, 9.0);
-        double utilization = simulateMultipleUserMultipleTasksByHours(new Date(), users, numHours, numInstances, new GeneralizedParetoRuntime(), true);
+        double utilization = simulateMultipleUserMultipleTasksByHours(new Date(), users, numHours, numInstances, new GeneralizedParetoRuntime(), true).utilization;
         double idleRatio = Utility.convertUtiliztionToIdleRatio(utilization);
         System.out.println("Idle Ratio: " + idleRatio);
         double profitPerHour = Utility.calculateProfitPerHour(idleRatio, price, gcpPrice, numInstances);
