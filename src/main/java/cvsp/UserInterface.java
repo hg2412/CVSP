@@ -73,7 +73,7 @@ public class UserInterface {
         System.out.println("Profit: " + numHours * 1.0 * profitPerHour);
     }
 
-    public static void task2() {
+    public static void task2() throws IOException {
         Scanner scan = new Scanner(System.in);
         System.out.println("Number of hours: ");
         int numHours = scan.nextInt();

@@ -19,6 +19,9 @@ public class NumTasksDistribution {
     public int getNextNumOfTasks() {
         return (int) (Math.ceil(Math.log(Math.random()) / Math.log(1.0 - p)));
     }
+    public double getMeanNumOfTasks(){
+        return (1.0/p);
+    }
 
     /**
      * Testing using Law of Large Number
@@ -30,7 +33,7 @@ public class NumTasksDistribution {
         double mean = 0;
         for (int i = 0; i < 10000; i++) {
             mean = mean * 1.0 * i * 1.0 / (i + 1);
-            int numTask = numTasksDistribution.getNextNumOfTasks();
+            int numTask = (int) numTasksDistribution.getNextNumOfTasks();
             mean += numTask * 1.0 / (i + 1);
         }
         System.out.println("Mean = " + mean);

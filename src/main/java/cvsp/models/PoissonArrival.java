@@ -44,4 +44,8 @@ public class PoissonArrival {
         return k - 1;
     }
 
+    public double getRate(){
+        return rate;
+    }
+
 }

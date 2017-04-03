@@ -26,13 +26,78 @@ public class Simulator {
         public double idleRatio;
         public double runtimeToWaittime;
         public double averageWaittime;
-
         public SimulationResult(double utilization, double idleRatio, double runtimeToWaittime, double averageWaittime) {
             this.utilization = utilization;
             this.idleRatio = idleRatio;
             this.runtimeToWaittime = runtimeToWaittime;
             this.averageWaittime = averageWaittime;
         }
+    }
+
+
+    public static class IdleRatioVersusTime{
+        public LinkedList<String> times;
+        public LinkedList<Double> idleRatios;
+
+        public IdleRatioVersusTime(){
+            times = new LinkedList<String>();
+            idleRatios = new LinkedList<Double>();
+        }
+
+        public String generateCSVString(){
+            StringBuilder result =  new StringBuilder();
+            for(int i = 0; i < times.size(); i++){
+                result.append("\"" + times.get(i) + "\"");
+                result.append(",");
+                result.append(idleRatios.get(i));
+                result.append("\n");
+            }
+            return result.toString();
+        }
+
+        public void writeToCSV(String filename) throws IOException {
+            FileWriter writer = new FileWriter(filename, true);
+            writer.write(generateCSVString());
+            writer.flush();
+            writer.close();
+            return;
+        }
+
+    }
+
+
+    public static class IdleRatioVersusNumTasks{
+        public LinkedList<Double> numTasks;
+        public LinkedList<Double> idleRatios;
+        public LinkedList<Double> profits;
+
+        public IdleRatioVersusNumTasks(){
+            numTasks = new LinkedList<Double>();
+            idleRatios = new LinkedList<Double>();
+            profits = new LinkedList<Double>();
+        }
+
+        public String generateCSVString(){
+            StringBuilder result =  new StringBuilder();
+            for(int i = 0; i < numTasks.size(); i++){
+                result.append("\"" + (int)(double)numTasks.get(i) + "\"");
+                result.append(",");
+                result.append(idleRatios.get(i));
+                result.append(",");
+                result.append(profits.get(i));
+                result.append("\n");
+            }
+            return result.toString();
+        }
+
+        public void writeToCSV(String filename) throws IOException {
+            FileWriter writer = new FileWriter(filename, true);
+            writer.write(generateCSVString());
+            writer.flush();
+            writer.close();
+            return;
+        }
+
     }
     /**
      * simulate the single user single-task job arrivals using Possion model and Pareto model and CVSP's schedulers
@@ -166,7 +231,7 @@ public class Simulator {
      * @param poissonArrival: Poisson Arrival Model
      * @param paretoRuntime:  Pareto Runtime Model
      */
-    public static SimulationResult simulateSingleUserRandomMultipleTasksByHours(Date startDate, int numHours, NumTasksDistribution numTasksDist, int numInstances, PoissonArrival poissonArrival, ParetoRuntime paretoRuntime, boolean writeToCSV) {
+    public static SimulationResult simulateSingleUserRandomMultipleTasksByHours(Date startDate, int numHours, NumTasksDistribution numTasksDist, int numInstances, PoissonArrival poissonArrival, ParetoRuntime paretoRuntime, boolean writeToCSV) throws IOException {
         MultipleTaskScheduler scheduler = new MultipleTaskScheduler(numInstances);
         //sync time with scheduler
         currentTime = (Date) startDate.clone();
@@ -176,6 +241,9 @@ public class Simulator {
         scheduler.setCurrentTime(new Date(currentTime.getTime()));
         scheduler.setStartTime(new Date(currentTime.getTime()));
         int jobCount = 0;
+
+        IdleRatioVersusTime idleRatioVersusTime = new IdleRatioVersusTime();
+
         while (time < numHours) {
             double arrivalTime = poissonArrival.getNextArrivalTime();
             time += arrivalTime;
@@ -189,7 +257,15 @@ public class Simulator {
             Job job = new Job(jobCount, numTasksDist.getNextNumOfTasks(), (int) Math.ceil(runtime * hourToSeconds));
             jobCount++;
             scheduler.addJob(job, MultipleTaskScheduler.SchedulePolicy.random);
+
+            //record system idle ratio
+            if (writeToCSV) {
+                idleRatioVersusTime.times.add(scheduler.getCurrentTime().toString());
+                idleRatioVersusTime.idleRatios.add(scheduler.getIdleRatio());
+            }
         }
+        //output idle ratio
+        if (writeToCSV) idleRatioVersusTime.writeToCSV("IdleRatioVersusTime M=" + numInstances + " N=" + numTasksDist.getMeanNumOfTasks() + " Rate=" + poissonArrival.getRate() + ".csv");
         return new SimulationResult(scheduler.getUtilizationRate(), scheduler.getIdleRatio(), scheduler.getRuntimeWaittimeRatio(), scheduler.getExpectedWaittime());
     }
 
@@ -414,14 +490,14 @@ public class Simulator {
         //simulateMultipleUserMultipleTasksByHours(new Date(), users, 300, 60, new ParetoRuntime(2, 0.5), false);
         //experiment();
         //experiment();
-        experimentIdleToRuntimeRatio();
+        experimentIdleRatioVersusNumTasks();
         //experimentExpectedWaitime();
     }
 
     /**
      * experiment using parameters in the paper
      */
-    public static void experiment() {
+    public static void experiment() throws IOException {
         int[] numInstances = {100, 200, 300, 400, 500}; // M in the paper
         double[] prices = {0.16, 0.145, 0.13};
         double[][] numTasks = {
@@ -505,6 +581,79 @@ public class Simulator {
                 System.out.println("Expected Idle Ratio in paper: " + theoreticalIdleRatio);
             }
         }
+
+    }
+
+
+
+    public static void experimentIdleRatioVersusTime() throws IOException {
+        int[] numInstances = {100, 200, 300, 400, 500}; // M in the paper
+        double[] prices = {0.16, 0.145, 0.13};
+        double[][] numTasks = {
+                {1.055, 1.0737, 1.0983, 1.1048, 1.1382},
+                {1.0547, 1.0733, 1.0981, 1.1045, 1.1377},
+                {1.0545, 1.0731, 1.0979, 1.1043, 1.1376}
+        };
+        double[][] rates =
+                {
+                        {40.77, 41.28, 41.79, 41.83, 42.07},
+                        {41.36, 41.87, 42.39, 42.44, 42.68},
+                        {41.65, 42.16, 42.69, 42.74, 42.98}
+                };
+        double[][] profits = new double[3][5];
+
+        int hours = 1000;
+
+        for (int i = 0; i < prices.length; i++) {
+            for (int j = 0; j < numInstances.length; j++) {
+                System.out.println("p=" + prices[i] + " M=" + numInstances[j] + "N=" + numTasks[i][j] + " Rates=" + rates[i][j]);
+                double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / numTasks[i][j]), numInstances[j], new PoissonArrival(rates[i][j]), new GeneralizedParetoRuntime(), false).utilization;
+                profits[i][j] = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
+                System.out.println("Profit: " + profits[i][j] + "\n");
+            }
+        }
+
+
+
+    }
+
+    public static void experimentIdleRatioVersusNumTasks() throws IOException {
+
+        int[] numInstances = {100, 200, 300, 400, 500}; // M in the paper
+        double[] prices = {0.16, 0.145, 0.13};
+        double[][] numTasks = {
+                {1.055, 1.0737, 1.0983, 1.1048, 1.1382},
+                {1.0547, 1.0733, 1.0981, 1.1045, 1.1377},
+                {1.0545, 1.0731, 1.0979, 1.1043, 1.1376}
+        };
+        double[][] rates =
+                {
+                        {40.77, 41.28, 41.79, 41.83, 42.07},
+                        {41.36, 41.87, 42.39, 42.44, 42.68},
+                        {41.65, 42.16, 42.69, 42.74, 42.98}
+                };
+
+        double[] N ={1.01, 2, 5, 10,25,50,100};
+
+        int hours = 1000;
+
+        for (int i = 0; i < prices.length; i++) {
+            for (int j = 0; j < numInstances.length; j++) {
+                IdleRatioVersusNumTasks idleRatioVersusNumTasks = new IdleRatioVersusNumTasks();
+                for(int k = 0; k < N.length; k++){
+                    System.out.println("p=" + prices[i] + " M=" + numInstances[j] + " N=" + N[k] + " Rate=" + rates[i][j]);
+                    double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / N[k]), numInstances[j], new PoissonArrival(rates[i][j]), new GeneralizedParetoRuntime(), false).utilization;
+                    double profit = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
+                    System.out.println("Profit: " + profit + "\n");
+                    idleRatioVersusNumTasks.numTasks.add(N[k]);
+                    idleRatioVersusNumTasks.idleRatios.add(1 / utilization - 1);
+                    idleRatioVersusNumTasks.profits.add(profit);
+                }
+                idleRatioVersusNumTasks.writeToCSV("IdleRatioVersusNumTasks M=" + numInstances[j] + " Rate=" + rates[i][j] + ".csv");
+            }
+        }
+
+
 
     }
 }
