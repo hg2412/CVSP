@@ -1,5 +1,6 @@
 ## Cloud Virtual Service Provider (CVSP)
-
+### Paper  
+[Zheng, Liang, Carlee Joe-Wong, Christopher G. Brinton, Chee Wei Tan, Sangtae Ha, and Mung Chiang. "On the Viability of a Cloud Virtual Service Provider." In Proceedings of the 2016 ACM SIGMETRICS International Conference on Measurement and Modeling of Computer Science, pp. 235-248. ACM, 2016.](http://www.princeton.edu/~liangz/paper/CVSP_SIGMETRICS.pdf)  
 ### How to Install and Compile
 #### Install Java 8  
 Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html  
