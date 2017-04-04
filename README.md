@@ -41,10 +41,10 @@ models package contains stochastic models for simulations
 ### Experiments Results  
 
 Idle Ratios Versus Number of Tasks  
-![Image of Experiments](images/Idle Ratios versus Number of Tasks.png)  
+![Image of Experiments](images/Idle%20Ratios%20versus%20Number%20of%20Tasks.png)  
 
 Profits Versus Number of Tasks  
-![Image of Experiments](images/Profits versus Number of Tasks.png)  
+![Image of Experiments](images/Profits%20versus%20Number%20of%20Tasks.png)  
 
 Idle Ratios Evolement with Time Example  
-![Image of Experiments](images/IdleRatio-Time Plots/IdleRatioVersusTime M=100 N=1.055 Rate=40.77.png)  
+![Image of Experiments](images/IdleRatio-Time%20Plots/IdleRatioVersusTime%20M=100%20N=1.055%20Rate=40.77.png)  
