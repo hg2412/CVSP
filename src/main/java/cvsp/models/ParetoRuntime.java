@@ -17,6 +17,14 @@ public class ParetoRuntime {
         ;
     }
 
+
+    /**
+     * constructor using GCP minTau
+     */
+    public ParetoRuntime(double alpha) {
+        this.alpha = alpha;
+    }
+
     /**
      * constructor that sets parameters of the model
      *

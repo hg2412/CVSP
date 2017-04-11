@@ -260,8 +260,10 @@ public class Simulator {
 
             //record system idle ratio
             if (writeToCSV) {
-                idleRatioVersusTime.times.add(scheduler.getCurrentTime().toString());
-                idleRatioVersusTime.idleRatios.add(scheduler.getIdleRatio());
+                if (jobCount % 10 == 0) {
+                    idleRatioVersusTime.times.add(scheduler.getCurrentTime().toString());
+                    idleRatioVersusTime.idleRatios.add(scheduler.getIdleRatio());
+                }
             }
         }
         //output idle ratio
@@ -490,7 +492,8 @@ public class Simulator {
         //simulateMultipleUserMultipleTasksByHours(new Date(), users, 300, 60, new ParetoRuntime(2, 0.5), false);
         //experiment();
         //experiment();
-        experimentIdleRatioVersusNumTasks();
+        //experimentIdleRatioVersusNumTasks();
+        experimentIdleRatioVersusTime();
         //experimentExpectedWaitime();
     }
 
@@ -523,7 +526,6 @@ public class Simulator {
                 System.out.println("Profit: " + profits[i][j] + "\n");
             }
         }
-
         /**
          for (int i = 0; i < prices.length; i++) {
          int j = 0;
@@ -603,11 +605,12 @@ public class Simulator {
         double[][] profits = new double[3][5];
 
         int hours = 1000;
+        double alpha = 1.5;
 
         for (int i = 0; i < prices.length; i++) {
             for (int j = 0; j < numInstances.length; j++) {
                 System.out.println("p=" + prices[i] + " M=" + numInstances[j] + "N=" + numTasks[i][j] + " Rates=" + rates[i][j]);
-                double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / numTasks[i][j]), numInstances[j], new PoissonArrival(rates[i][j]), new GeneralizedParetoRuntime(), false).utilization;
+                double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / numTasks[i][j]), numInstances[j], new PoissonArrival(rates[i][j]), new ParetoRuntime(alpha), true).utilization;
                 profits[i][j] = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
                 System.out.println("Profit: " + profits[i][j] + "\n");
             }
@@ -637,23 +640,23 @@ public class Simulator {
 
         int hours = 1000;
 
+        double alpha = 1.5;
+
         for (int i = 0; i < prices.length; i++) {
             for (int j = 0; j < numInstances.length; j++) {
                 IdleRatioVersusNumTasks idleRatioVersusNumTasks = new IdleRatioVersusNumTasks();
                 for(int k = 0; k < N.length; k++){
                     System.out.println("p=" + prices[i] + " M=" + numInstances[j] + " N=" + N[k] + " Rate=" + rates[i][j]);
-                    double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / N[k]), numInstances[j], new PoissonArrival(rates[i][j]), new GeneralizedParetoRuntime(), false).utilization;
+                    double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / N[k]), numInstances[j], new PoissonArrival(rates[i][j]), new ParetoRuntime(alpha), false).utilization;
                     double profit = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
                     System.out.println("Profit: " + profit + "\n");
                     idleRatioVersusNumTasks.numTasks.add(N[k]);
                     idleRatioVersusNumTasks.idleRatios.add(1 / utilization - 1);
                     idleRatioVersusNumTasks.profits.add(profit);
                 }
-                idleRatioVersusNumTasks.writeToCSV("IdleRatioVersusNumTasks M=" + numInstances[j] + " Rate=" + rates[i][j] + ".csv");
+                idleRatioVersusNumTasks.writeToCSV("IdleRatioVersusNumTasks M=" + numInstances[j] + " Rate=" + rates[i][j] + " Alpha=" + alpha + ".csv");
             }
         }
-
-
 
     }
 }

@@ -15,11 +15,25 @@
             <artifactId>commons-math3</artifactId>
             <version>3.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-core -->
         <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-dataproc</artifactId>
-            <version>v1-rev41-1.22.0</version>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-core</artifactId>
+            <version>0.12.0-alpha</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-compute</artifactId>
+            <version>0.12.0-alpha</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.22.0</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
