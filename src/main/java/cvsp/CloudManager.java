@@ -30,12 +30,23 @@ public class CloudManager {
      */
     private static String startupSrcipt= "#! /bin/bash\n" +
             "apt-get update\n" +
+            "apt-get install -y shellinabox\n" +
+            "invoke-rc.d shellinabox restart\n" +
+            "useradd guest1\n" +
+            "echo -e \"123456\\n123456\\n\" | passwd guest1\n" +
+            "usermod -aG sudo guest1\n" +
             "apt-get install -y apache2\n" +
             "cat <<EOF > /var/www/html/index.html\n" +
             "<html><body><h1>Cloud Virtual Service Provider</h1>\n" +
-            "<p>This page was created from a simple startup script!</p>\n" +
+            "<p>Your username is guest1, password is 123456</p>\n" +
+            "<p>You can run your jobs using the terminal:</p>\n" +
+            "<p><a href=\"https://YOUR_PUBLIC_IP:4200\">https://YOUR_PUBLIC_IP:4200</a></p>\n" +
             "</body></html>\n" +
             "EOF";
+
+
+
+            ;
 
     static{
         try {
@@ -96,11 +107,12 @@ public class CloudManager {
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    public List<InstanceId> createInstances(int number, String instanceName, boolean shouldWait) throws TimeoutException, InterruptedException {
+    public List<InstanceId> createInstances(int number, String instanceName, boolean shouldWait, boolean staticIp) throws TimeoutException, InterruptedException {
         ImageId imageId = ImageId.of("ubuntu-os-cloud", "ubuntu-1604-xenial-v20170330");
         NetworkId networkId = NetworkId.of("default");
-        AttachedDisk attachedDisk = AttachedDisk.of(AttachedDisk.CreateDiskConfiguration.of(imageId));
-        MachineTypeId machineTypeId = MachineTypeId.of("us-east1-c", "n1-standard-1");
+
+        AttachedDisk attachedDisk = AttachedDisk.of(AttachedDisk.CreateDiskConfiguration.newBuilder(imageId).setAutoDelete(true).build());;
+        MachineTypeId machineTypeId = MachineTypeId.of("us-east1-c", "g1-small");
 
         LinkedList<InstanceId> instanceIds = new LinkedList<InstanceId>();
         LinkedList<Operation> operations = new LinkedList<Operation>();
@@ -108,15 +120,25 @@ public class CloudManager {
         for(int i = 0; i < number; i++){
             InstanceId instanceId = InstanceId.of("us-east1-c", instanceName.toLowerCase() + i);
             HashMap<String, String> metaDataMap = new HashMap<String, String>();
+            NetworkInterface networkInterface = null;
+            String ipAddress = "YOUR_PUBLIC_IP";
+            if (!staticIp) {
+                networkInterface = NetworkInterface.newBuilder(networkId).
+                        setAccessConfigurations(AccessConfig.newBuilder()
+                                .setName("external-nat")
+                                .build())
+                        .build();
+            }else{
+                Address externalIp = compute.getAddress(createExternalIP(instanceName.toLowerCase() + i));
+                AccessConfig accessConfig = AccessConfig.of(externalIp.getAddress());
+                ipAddress = AccessConfig.of(externalIp.getAddress()).getNatIp();
+                System.out.println("Static IP: " + ipAddress);
+                networkInterface = NetworkInterface.newBuilder(networkId)
+                        .setAccessConfigurations(accessConfig)
+                        .build();
 
-
-
-            NetworkInterface networkInterface = NetworkInterface.newBuilder(networkId).
-                    setAccessConfigurations(AccessConfig.newBuilder()
-                            .setName("external-nat")
-                            .build())
-                    .build();
-            metaDataMap.put("startup-script", startupSrcipt);
+            }
+            metaDataMap.put("startup-script", startupSrcipt.replace("YOUR_PUBLIC_IP", ipAddress));
             Metadata metadata = Metadata.of(metaDataMap);
             InstanceInfo instanceInfo = InstanceInfo.newBuilder(instanceId, machineTypeId).setDescription("CVSP")
                     .setAttachedDisks(attachedDisk)
@@ -148,7 +170,7 @@ public class CloudManager {
 
 
     /**
-     * list all instances
+     * list all instances status
      * @param zone
      */
     public void listInstances(ZoneId zone){
@@ -165,6 +187,27 @@ public class CloudManager {
 
     }
 
+
+    /**
+     * list all instances status
+     * @param zone
+     */
+    public List<InstanceId> getInstanceIds(ZoneId zone){
+        Iterator<Instance> instanceIterator;
+        LinkedList<InstanceId> instanceIds = new LinkedList<InstanceId>();
+        System.out.println("List Instances:");
+        if (zone != null) {
+            instanceIterator = compute.listInstances(zone.getZone()).iterateAll();
+        } else {
+            instanceIterator = compute.listInstances().iterateAll();
+        }
+        while (instanceIterator.hasNext()) {
+            //System.out.println(instanceIterator.next());
+            instanceIds.add(instanceIterator.next().getInstanceId());
+        }
+        return instanceIds;
+
+    }
     /**
      * list public ip of all instances
      */
@@ -179,6 +222,9 @@ public class CloudManager {
     }
 
 
+
+
+
     /**
      * stop all instances
      * @param instanceIds
@@ -189,13 +235,28 @@ public class CloudManager {
         }
     }
 
+
+    /**
+     * stop all instances
+     * @param instanceIds
+     */
+    public void deleteInstances(List<InstanceId> instanceIds){
+        for(InstanceId instanceId : instanceIds){
+            System.out.println("Deleting Instance" + instanceId);
+            compute.getInstance(instanceId).delete();
+        }
+    }
+
+
     public static void main(String[] args) throws TimeoutException, InterruptedException {
         CloudManager cloudManager = CloudManager.getInstance();
         cloudManager.listInstances(null);
-        List<InstanceId> instanceIds = cloudManager.createInstances(3, "bingshenqiangzhe", true);
+        List<InstanceId> instanceIds = cloudManager.createInstances(2, "cvsptest3", true, true);
         cloudManager.listPublicIpAddresses();
+        //System.out.println(startupSrcipt);
 
         //cloudManager.listInstances(null);
         //cloudManager.shutdownInstances(instanceIds);
+        //cloudManager.deleteInstances(cloudManager.getInstanceIds(null));
     }
 }
