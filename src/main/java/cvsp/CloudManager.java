@@ -18,6 +18,9 @@ import com.google.cloud.compute.NetworkId;
 import com.google.cloud.compute.NetworkInterface.AccessConfig;
 
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
@@ -28,29 +31,12 @@ public class CloudManager {
     /**
      * startup script to run on instances
      */
-    private static String startupSrcipt= "#! /bin/bash\n" +
-            "apt-get update\n" +
-            "apt-get install -y shellinabox\n" +
-            "invoke-rc.d shellinabox restart\n" +
-            "useradd guest1\n" +
-            "echo -e \"123456\\n123456\\n\" | passwd guest1\n" +
-            "usermod -aG sudo guest1\n" +
-            "apt-get install -y apache2\n" +
-            "cat <<EOF > /var/www/html/index.html\n" +
-            "<html><body><h1>Cloud Virtual Service Provider</h1>\n" +
-            "<p>Your username is guest1, password is 123456</p>\n" +
-            "<p>You can run your jobs using the terminal:</p>\n" +
-            "<p><a href=\"https://YOUR_PUBLIC_IP:4200\">https://YOUR_PUBLIC_IP:4200</a></p>\n" +
-            "</body></html>\n" +
-            "EOF";
-
-
-
-            ;
+    private static String startupSrcipt= "";
 
     static{
         try {
             ourInstance = new CloudManager();
+            startupSrcipt = getStartupScript("CVSP.sh");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -247,16 +233,32 @@ public class CloudManager {
         }
     }
 
+    public static String getStartupScript(String filename) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+        while (line != null) {
+            sb.append(line + "\n");
+            line = br.readLine();
+        }
+
+        return sb.toString();
+    }
+
 
     public static void main(String[] args) throws TimeoutException, InterruptedException {
-        CloudManager cloudManager = CloudManager.getInstance();
-        cloudManager.listInstances(null);
-        List<InstanceId> instanceIds = cloudManager.createInstances(2, "cvsptest3", true, true);
-        cloudManager.listPublicIpAddresses();
-        //System.out.println(startupSrcipt);
 
-        //cloudManager.listInstances(null);
+
+        CloudManager cloudManager = CloudManager.getInstance();
+//        cloudManager.listInstances(null);
+        List<InstanceId> instanceIds = cloudManager.createInstances(1, "cvsp", true, true);
+        cloudManager.listPublicIpAddresses();
+//        //System.out.println(startupSrcipt);
+
+        cloudManager.listInstances(null);
         //cloudManager.shutdownInstances(instanceIds);
-        //cloudManager.deleteInstances(cloudManager.getInstanceIds(null));
+        //
+
+//        cloudManager.deleteInstances(cloudManager.getInstanceIds(null));
     }
 }

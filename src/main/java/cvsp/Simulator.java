@@ -493,8 +493,9 @@ public class Simulator {
         //experiment();
         //experiment();
         //experimentIdleRatioVersusNumTasks();
-        experimentIdleRatioVersusTime();
+        //experimentIdleRatioVersusTime();
         //experimentExpectedWaitime();
+        experimentExpectedIdleRatio();
     }
 
     /**
@@ -655,6 +656,50 @@ public class Simulator {
                     idleRatioVersusNumTasks.profits.add(profit);
                 }
                 idleRatioVersusNumTasks.writeToCSV("IdleRatioVersusNumTasks M=" + numInstances[j] + " Rate=" + rates[i][j] + " Alpha=" + alpha + ".csv");
+            }
+        }
+
+    }
+
+
+    public static void experimentExpectedIdleRatio() throws IOException {
+
+        int[] numInstances = {100, 200, 300, 400, 500}; // M in the paper
+        double[] prices = {0.16, 0.145, 0.13};
+        double[][] numTasks = {
+                {1.055, 1.0737, 1.0983, 1.1048, 1.1382},
+                {1.0547, 1.0733, 1.0981, 1.1045, 1.1377},
+                {1.0545, 1.0731, 1.0979, 1.1043, 1.1376}
+        };
+        double[][] rates =
+                {
+                        {40.77, 41.28, 41.79, 41.83, 42.07},
+                        {41.36, 41.87, 42.39, 42.44, 42.68},
+                        {41.65, 42.16, 42.69, 42.74, 42.98}
+                };
+
+        double[] N ={1.01, 2};
+
+        int hours = 1000;
+
+        double alpha = 1.5;
+
+        for (int i = 0; i < prices.length; i++) {
+            for (int j = 0; j < numInstances.length; j++) {
+                IdleRatioVersusNumTasks idleRatioVersusNumTasks = new IdleRatioVersusNumTasks();
+                for(int k = 0; k < N.length; k++){
+                    System.out.println("p=" + prices[i] + " M=" + numInstances[j] + " N=" + N[k] + " Rate=" + rates[i][j]);
+                    double utilization = simulateSingleUserRandomMultipleTasksByHours(new Date(), hours, new NumTasksDistribution(1.0 / N[k]), numInstances[j], new PoissonArrival(rates[i][j]), new ParetoRuntime(alpha), false).utilization;
+                    double profit = (prices[i] - Utility.getGCPDiscount(Math.max(1 / utilization - 1, 0)) * 0.17) * numInstances[j] * hours * utilization;
+                    System.out.println("Profit: " + profit + "\n");
+                    double idleRatio = 1 / utilization - 1;
+
+
+                    ExpectedIdleRatio expectedIdleRatio = new ExpectedIdleRatio(alpha, (int) N[k], numInstances[j], rates[i][j], hours, 1.0 / 6);
+                    System.out.println(expectedIdleRatio);
+                    System.out.println("Simulation Idle Ratio: " + idleRatio);
+                    System.out.println("Expected Idle Ratio: " + expectedIdleRatio.calculate());
+                }
             }
         }
 
