@@ -36,7 +36,7 @@ public class CloudManager {
     static{
         try {
             ourInstance = new CloudManager();
-            startupSrcipt = getStartupScript("CVSP.sh");
+            startupSrcipt = getStartupScript("CVSP-hadoop.sh");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,7 +173,6 @@ public class CloudManager {
 
     }
 
-
     /**
      * list all instances status
      * @param zone
@@ -206,10 +205,6 @@ public class CloudManager {
         }
 
     }
-
-
-
-
 
     /**
      * stop all instances
@@ -246,9 +241,20 @@ public class CloudManager {
     }
 
 
+    public List<HadoopInstance> getHadoopInstances() throws TimeoutException, InterruptedException {
+        List<HadoopInstance> hadoopInstances = new ArrayList<HadoopInstance>();
+        Iterator<Instance> instanceIterator;
+        instanceIterator = compute.listInstances().iterateAll();
+        int count = 0;
+        while (instanceIterator.hasNext()) {
+            Instance instance = instanceIterator.next();
+            hadoopInstances.add(new HadoopInstance(count++, instance.getNetworkInterfaces().get(0).getAccessConfigurations().get(0).getNatIp()));
+        }
+        return hadoopInstances;
+    }
+
+
     public static void main(String[] args) throws TimeoutException, InterruptedException {
-
-
         CloudManager cloudManager = CloudManager.getInstance();
 //        cloudManager.listInstances(null);
         List<InstanceId> instanceIds = cloudManager.createInstances(1, "cvsp", true, true);

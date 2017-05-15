@@ -10,16 +10,19 @@ import java.util.Queue;
 public class Instance {
 
     public int instanceId;
-    private Queue<Task> waitingTasks; // a queue of waiting tasks
-    private Task runningTask; // current running task
+    protected Queue<Task> waitingTasks; // a queue of waiting tasks
+    protected Task runningTask; // current running task
 
     /**
      * constructor of the instance, and set instance id
-     *
      * @param instanceId
      */
     public Instance(int instanceId) {
         this.instanceId = instanceId;
+        waitingTasks = new LinkedList<Task>();
+    }
+
+    public Instance() {
         waitingTasks = new LinkedList<Task>();
     }
 
@@ -60,7 +63,6 @@ public class Instance {
 
     /**
      * run all the tasks remaining in the system
-     *
      * @return completed tasks
      */
     public LinkedList<Task> runTasks() {
